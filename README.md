@@ -5,7 +5,7 @@ Writing a Simple Operating System —from Scratch
 
 ## 譯者前言
 
-這是基於這篇英文文章所翻譯的教學，主要是作為我個人在學習過程中的筆記。譯者是曾在台灣留學的澳門人，因此專業用語上會以台灣的用詞為主。雖說是翻譯，但譯者在閱讀本教學的同時也會參考本教學所參考的 Writing a Simple Operating System —
+這是基於[這篇](https://github.com/cfenollosa/os-tutorial)英文文章所翻譯的教學，主要是作為我個人在學習過程中的筆記。譯者是曾在台灣留學的澳門人，因此專業用語上會以台灣的用詞為主。雖說是翻譯，但譯者在閱讀本教學的同時也會參考本教學所參考的 Writing a Simple Operating System —
 from Scratch 一書，因此本中文內容也不一定是直接從原文所翻譯過來，譯者可能會按個人習慣對文本內容進行補充或修改。
 
 ---
