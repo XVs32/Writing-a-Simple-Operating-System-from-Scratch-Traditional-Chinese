@@ -1,5 +1,8 @@
-Writing a Simple Operating System —from Scratch
-===========
+Writing a Simple Operating System—from Scratch
+
+###### tags: `Writing a Simple Operating System—from Scratch`
+
+---
 
 如何從零開始創建作業系統！
 
