@@ -1,15 +1,11 @@
-*Concepts you may want to Google beforehand: stack*
+*在開始前你需要熟悉的概念：stack*
 
-**Goal: Learn how to use the stack**
+**目標：學習如何使用 stack**
 
-The usage of the stack is important, so we'll write yet another boot sector
-with an example.
+stack 是非常重要的功能，值得我們另寫一個例子。
 
-Remember that the `bp` register stores the base address (i.e. bottom) of the stack,
-and `sp` stores the top, and that the stack grows downwards from `bp` (i.e. `sp` gets
-decremented)
+請記住 `bp` reg 保存有 stack 的基地址（即 base address），而 `sp` 存儲 stack 的頂部，而 stack 從 `bp` 開始向下長。
 
-This lesson is quite straightforward, so jump ahead to the code.
+本節內容非常直觀，請直接打開 `boot_sect_stack.asm` 文件，閱讀原始碼並嘗試理解註釋。
 
-I suggest that you try accessing in-stack memory addresses by yourself, 
-at different points in the code, and see what happens.
+也可以嘗試在不同的位置訪問 stack，觀察 stack 的變化以及不同指令對 stack 的影響。
