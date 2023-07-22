@@ -1,63 +1,38 @@
-*Concepts you may want to Google beforehand: hard disk, cylinder, head, sector, 
-carry bit*
+*在開始前你需要熟悉的概念: 硬碟, cylinder, head, sector, carry bit*
 
-**Goal: Let the bootsector load data from disk in order to boot the kernel**
+**目標: 讓 Boot Sector 從硬碟載入資料以啟動 kernel**
 
-Our OS won't fit inside the bootsector 512 bytes, so we need to read data from
-a disk in order to run the kernel.
+由於 OS 是不太可能塞進只有 512 bytes 的 Boot Sector，因此我們需要從硬碟載入 kernel。
 
-Thankfully, we don't have to deal with turning spinning platters on and off,
-we can just call some BIOS routines, like we did to print characters on the screen.
-To do so, we set `al` to `0x02` (and other registers with the required cylinder, head
-and sector) and raise `int 0x13`
+而幸運的是 BIOS 內有提供跟硬碟的對接，讓我們可以透過 API 來操作硬碟。
+為此，我們把 `al` 設置為 `0x02`（並將其他 reg 設置為所需的cylinder, head, sector），然後執行 `int 0x13`。
 
-You can access [a detailed int 13h guide here](http://stanislavs.org/helppc/int_13-2.html)
+詳細請參考[int 13h 說明](http://stanislavs.org/helppc/int_13-2.html)。
 
-On this lesson we will use for the first time the *carry bit*, which is an extra bit
-present on each register which stores when an operation has overflowed its current
-capacity:
+在這一節課中，我們需要使用*carry bit*，它是每個 reg 中的一個額外的 bit，用於記錄操作是否溢出：
 
 ```nasm
 mov ax, 0xFFFF
-add ax, 1 ; ax = 0x0000 and carry = 1
+add ax, 1 ; ax = 0x0000，carry bit = 1
 ```
 
-The carry isn't accessed directly but used as a control structure by other operators,
-like `jc` (jump if the carry bit is set)
+carry bit 在這邊被用作控制其他指令的判斷式，例如 `jc`（如果 carry bit 是 set，則跳轉）。
 
-The BIOS also sets `al` to the number of sectors read, so always compare it
-to the expected number.
+接下來請自行閱讀 `boot_sect_disk.asm` 中從硬碟讀取資料的完整過程。
 
+在 `boot_sect_main.asm` 準備了磁碟讀取的參數並呼叫 `disk_load`。
+在這裡我們寫入了一些不屬於 Boot Sector，超出了 512 bytes 的資料。
 
-Code
-----
+順帶一提，Boot Sector 是第 0 號硬碟的第 0 cylinder 的第 0 head 中的第 1 個 sector（sector 是從 1 開始的）。
+因此，512 bytes 之後的 512 bytes 是對應於第 0 號硬碟的第 0 cylinder 的第 0 head 中的第 2 個 sector。
 
-Open and examine `boot_sect_disk.asm` for the complete routine that
-reads from disk.
+而我們的主程式將會填充這些資料並讓 Boot Sector 去讀取。
 
-`boot_sect_main.asm` prepares the parameters for disk read and calls `disk_load`.
-Notice how we write some extra data which does not actually belong to the boot
-sector, since it is outside the 512 bits mark.
+**注意: 發生 "It doesn't work, I don't know why" 的情況時，請確保 qemu 從正確的磁碟開機，並將 `dl` 設置為對應的硬碟**
 
-The boot sector is actually sector 1 (the first one, sectors start at 1)
-of cylinder 0 of head 0 of hdd 0.
+一般情況下 BIOS 在呼叫 Bootloader 前會自行把 `dl` 設置為硬碟編號。
+然而在使用 qemu 從硬碟開機時，可能會出現問題。
 
-Thus, any bytes after byte 512 correspond to sector 2 of cylinder 0 of head 0 of hdd 0
-
-The main routine will fill it with sample data and then let the bootsector
-read it.
-
-**Note: if you keep getting errors and your code seems fine, make sure that qemu
-is booting from the right drive and set the drive on `dl` accordingly**
-
-The BIOS sets `dl` to the drive number before calling the bootloader. However,
-I found some problems with qemu when booting from the hdd.
-
-There are two quick options:
-
-1. Try the flag `-fda` for example, `qemu -fda boot_sect_main.bin` which will set `dl`
-as `0x00`, it seems to work fine then.
-2. Explicitly use the flag `-boot`, e.g. `qemu boot_sect_main.bin -boot c` which 
-automatically sets `dl` as `0x80` and lets the bootloader read data
-
-
+以下提供兩個可能的解決方法：
+1. 使用 `-fda` 選項，例如，`qemu -fda boot_sect_main.bin`，這會把 `dl` 設置為 `0x00`。
+2. 使用 `-boot` 旗標，例如，`qemu boot_sect_main.bin -boot c`，這會自動把 `dl` 設置為 `0x80`，讓 Bootloader 可以讀取資料。
