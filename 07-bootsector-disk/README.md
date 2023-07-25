@@ -28,7 +28,7 @@ carry bit 在這邊被用作控制其他指令的判斷式，例如 `jc`（如�
 
 而我們的主程式將會填充這些資料並讓 Boot Sector 去讀取。
 
-**注意: 發生 "It doesn't work, I don't know why" 的情況時，請確保 qemu 從正確的磁碟開機，並將 `dl` 設置為對應的硬碟**
+**注意: "It doesn't work, I don't know why" 的時侯，請確保 qemu 從正確的磁碟開機，並將 `dl` 設置為對應的硬碟**
 
 一般情況下 BIOS 在呼叫 Bootloader 前會自行把 `dl` 設置為硬碟編號。
 然而在使用 qemu 從硬碟開機時，可能會出現問題。
