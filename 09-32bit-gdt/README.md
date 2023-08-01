@@ -1,31 +1,17 @@
-*Concepts you may want to Google beforehand: GDT*
+**在開始前你需要熟悉的概念：GDT**
 
-**Goal: program the GDT**
+**目標：編寫 GDT（Global Descriptor Table）**
 
-Remember segmentation from lesson 6? The offset was left shifted
-to address an extra level of indirection.
+還記得第 6 課的 segmentation 嗎？
 
-In 32-bit mode, segmentation works differently. Now, the offset becomes an
-index to a segment descriptor (SD) in the GDT. This descriptor defines
-the base address (32 bits), the size (20 bits) and some flags, like
-readonly, permissions, etc. To add confusion, the data structures are split,
-so open the os-dev.pdf file and check out the figure on page 34 or the 
-Wikipedia page for the GDT.
+在 32 位保護模式下，segmentation 的運作方式有所不同。在 GDT 中，偏移量被包含在 Segment Descriptor 中，SD 負責定義基址（32 位元）、大小（20 位元）以及一些旗標，例如唯讀、權限等。詳細請打開 os-dev.pdf 檔案，查看第 34 頁的圖或參考 GDT 的維基百科頁面。
 
-The easiest way to program the GDT is to define two segments, one for code
-and another for data. These can overlap which means there is no memory protection,
-but it's good enough to boot, we'll fix this later with a higher language.
+編寫 GDT 最簡單的方式是定義兩個 Segment，一個用於程式碼，另一個用於資料。Segment 之間可以重疊，同時也意味著並沒有記憶體保護，但對於 booting 來說沒有也沒差，在後續的高階程式碼再解決這個問題也不晚。
 
-As a curiosity, the first GDT entry must be `0x00` to make sure that the
-programmer didn't make any mistakes managing addresses.
+需要注意的是，為了位址管理上的便利，第一個 GDT 的位址必須是 `0x00`。
 
-Furthermore, the CPU can't directly load the GDT address, but it requires
-a meta structure called the "GDT descriptor" with the size (16b) and address
-(32b) of our actual GDT. It is loaded with the `lgdt` operation.
+此外，CPU 需要透過「GDT 描述子」（GDT Descriptor）來載入 GDT，其中包含實際 GDT 的大小（16 位元）和位址（32 位元）。而 GDT Descriptor 可以通過 `lgdt` 指令載入。
 
-Let's directly jump to the GDT code in assembly. Again, to understand
-all the segment flags, refer to the os-dev.pdf document. The theory for
-this lesson is quite complex.
+請閱讀本節課的 GDT 程式碼。關於 flag 的詳細資訊，請參考 os-dev.pdf 文件。
 
-In the next lesson we will make the switch to 32-bit protected mode
-and test our code from these lessons.
+在下一課中，我們終於會切換到 32 位保護模式並測試這幾節課的程式碼。
