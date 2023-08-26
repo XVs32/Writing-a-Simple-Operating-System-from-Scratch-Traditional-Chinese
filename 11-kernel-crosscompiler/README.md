@@ -1,76 +1,44 @@
-*Concepts you may want to Google beforehand: cross-compiler*
+**在開始前你需要熟悉的概念：交叉編譯器 (cross-compiler)**
 
-**Goal: Create a development environment to build your kernel**
+**目標：建立開發 kernel 用的環境**
 
-If you're using a Mac, you will need to do this process right away. Otherwise, it could have waited
-for a few more lessons. Anyway, you will need a cross-compiler once we jump to developing in a higher
-language, that is, C. [Read why](http://wiki.osdev.org/Why_do_I_need_a_Cross_Compiler%3F)
+譯者注：原文內容是基於 MAC 的開發環境建立，而譯者手上的是 Ubuntu 系統，因此這邊也會以 Ubuntu 的環境建立為準。
 
-I'll be adapting the instructions [at the OSDev wiki](http://wiki.osdev.org/GCC_Cross-Compiler). 
+無論如何，一旦我們開始使用高階語言，將無可避免地需要使用 [cross-compiler](http://wiki.osdev.org/Why_do_I_need_a_Cross_Compiler%3F)。
 
+所需套件
+---------
 
-Required packages
------------------
+一般請況下你的 Ubuntu 系統已經預載了，如果沒有的話就請安裝以下套件：
 
-First, install the required packages. On linux, use your package distribution. On a Mac, [install brew](http://brew.sh/) if
-you didn't do it on lesson 00, and get those packages with `brew install`
-
-- gmp
-- mpfr
-- libmpc
 - gcc
+- binutils
 
-Yes, we will need `gcc` to build our cross-compiled `gcc`, especially on a Mac where gcc has been deprecated for `clang`
+---------
+Cross compile 指令
+雖然我們安裝了 gcc, 但實際需要編譯的並不是在現代64位系統上運行的可執行檔。
+以本教程為例，我們需要的是32位用的可執行檔。
+幸運的是，我們只需要加上 `-m32` 即可。
 
-Once installed, find where your packaged gcc is (remember, not clang) and export it. For example:
+gcc: `gcc -m32 -fno-pie`
 
-```
-export CC=/usr/local/bin/gcc-4.9
-export LD=/usr/local/bin/gcc-4.9
-```
+`-m32`是指定 32 位，
+而`fno-pie`則是 Position Independent Executable (PIE)，
+我們在寫的是 kernel，是放在固定位置的，自然也不需要 PIE 了。
 
-We will need to build binutils and a cross-compiled gcc, and we will put them into `/usr/local/i386elfgcc`, so
-let's export some paths now. Feel free to change them to your liking.
+使用 linker 時也是同樣的道理。
 
-```
-export PREFIX="/usr/local/i386elfgcc"
-export TARGET=i386-elf
-export PATH="$PREFIX/bin:$PATH"
-```
+ld: `ld -m elf_i386`
 
-binutils
---------
-
-Remember: always be careful before pasting walls of text from the internet. I recommend copying line by line.
-
-```sh
-mkdir /tmp/src
-cd /tmp/src
-curl -O http://ftp.gnu.org/gnu/binutils/binutils-2.24.tar.gz # If the link 404's, look for a more recent version
-tar xf binutils-2.24.tar.gz
-mkdir binutils-build
-cd binutils-build
-../binutils-2.24/configure --target=$TARGET --enable-interwork --enable-multilib --disable-nls --disable-werror --prefix=$PREFIX 2>&1 | tee configure.log
-make all install 2>&1 | tee make.log
-```
-
-gcc
 ---
-```sh
-cd /tmp/src
-curl -O https://ftp.gnu.org/gnu/gcc/gcc-4.9.1/gcc-4.9.1.tar.bz2
-tar xf gcc-4.9.1.tar.bz2
-mkdir gcc-build
-cd gcc-build
-../gcc-4.9.1/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --disable-libssp --enable-languages=c --without-headers
-make all-gcc 
-make all-target-libgcc 
-make install-gcc 
-make install-target-libgcc 
+
+完成！於是編譯器和 linker 的環境建立就到此為止，然而原文教程是基於 MAC 環境。
+用的是 `i386-elf-` 系列，於是山不轉路轉，來配合他一下。
+
+```
+alias i386-elf-gcc='gcc -m32 -fno-pie'
+alias i386-elf-ld='ld -m elf_i386'
 ```
 
-That's it! You should have all the GNU binutils and the compiler at `/usr/local/i386elfgcc/bin`, prefixed by `i386-elf-` to avoid
-collisions with your system's compiler and binutils.
-
-You may want to add the `$PATH` to your `.bashrc`. From now on, on this tutorial, we will explicitly use the prefixes when using
-the cross-compiled gcc.
+這樣就不用特別修改後面使用的 Makefile 了。
+注意有需要的話請把以上 `alias` 自行加入到 `.bashrc`，可以省卻每次重新開機後的設定。
