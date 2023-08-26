@@ -1,23 +1,19 @@
-*Concepts you may want to Google beforehand: interrupts, pipelining*
+*在開始前你需要熟悉的概念：中斷 (interrupts)，流水線 (pipelining)*
 
-**Goal: Enter 32-bit protected mode and test our code from previous lessons**
+**目標：進入 32 位保護模式並測試前面課程的程式碼**
 
-To jump into 32-bit mode:
+要進入 32 位保護模式，我們需要依序執行以下步驟：
 
-1. Disable interrupts
-2. Load our GDT
-3. Set a bit on the CPU control register `cr0`
-4. Flush the CPU pipeline by issuing a carefully crafted far jump
-5. Update all the segment registers
-6. Update the stack
-7. Call to a well-known label which contains the first useful code in 32 bits
+1. 停用 interrupt
+2. 載入 GDT
+3. 把 CPU 控制用的 reg (CR0) 中的某個位元設為 1
+4. 使用一個特定的 jmp 指令來刷新 CPU pipeline
+5. 更新所有的 segment regs
+6. 更新 stack
+7. 呼叫第一段 32 位程式碼
 
-We will encapsulate this process on the file `32bit-switch.asm`. Open it
-and take a look at the code.
+這個過程封裝在 `32bit-switch.asm` 中，請打開它並閱讀程式碼。
 
-After entering 32-bit mode, we will call `BEGIN_PM` which is the entry point
-for our actual useful code (e.g. kernel code, etc). You can read the code
-at `32bit-main.asm`. Compile and run this last file and you will see the two 
-messages on the screen.
+進入 32 位保護模式後，我們將呼叫 `BEGIN_PM`，這是實際有效的 32 位程式碼的進入點 (例如：kernel code 等)。你可以閱讀 `32bit-main.asm` 中的程式碼。編譯並執行這個檔案，螢幕上將會出現兩個訊息。
 
-Congratulations! Our next step will be to write a simple kernel
+下一步將會是撰寫一個簡單的 kernel。
